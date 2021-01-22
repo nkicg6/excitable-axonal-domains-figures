@@ -31,4 +31,11 @@ Jython script run after tracing ROIs in a tyrosine hydroxylase image. Script wil
 
 Used to make Figure 3. 
 
-## 
+## `fiji/node_intensity_analysis.py`
+
+Jython script to extract fluoro intensity from pre-traced ROI's and source images. 
+
+## Figure code
+
+Contains R scripts used to do analysis, statistics, and generate plots for figures. 
+
