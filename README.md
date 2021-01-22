@@ -1,6 +1,6 @@
 # Utility scripts and figure analysis code for my thesis work.
 
-* Key
+# Scripts Key
 
 ## `utils/rename_gather_multipoint_a1r.py`
 
