@@ -13,6 +13,9 @@ Version: 2.1.0/1.53c
 Build: 5f23140693
 Date: 2020-08-02T03:43:22+0000
 ```
+## `figures/*`
+
+Contains R scripts used to do data wrangling, statistics, and generate plots for figures. 
 
 ## `utils/rename_gather_multipoint_a1r.py`
 
@@ -35,7 +38,4 @@ Used to make Figure 3.
 
 Jython script to extract fluoro intensity from pre-traced ROI's and source images. 
 
-## Figure code
-
-Contains R scripts used to do analysis, statistics, and generate plots for figures. 
 
