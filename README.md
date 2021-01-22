@@ -1,6 +1,17 @@
 # Utility scripts and figure analysis code for my thesis work.
 
+Initial submission date: TBD 
+BioRxiv link: TBD
+
 # Scripts Key
+
+Please note, these scripts are provided as-is and will not directly run to generate the figures. This is largely due to the fact that they contain hard coded variabes of relative file paths as they did when they were used for the primary analysis. Others were used as part of semi-automated pipelines and bound to key strokes for faster and consistent analysis and data saving (e.g. `th_intensity`). The `.py` files in the Fiji directory are meant to be run with the built in jython interpreter included with Fiji. The Fiji version at the time of submission was: 
+
+```
+Version: 2.1.0/1.53c
+Build: 5f23140693
+Date: 2020-08-02T03:43:22+0000
+```
 
 ## `utils/rename_gather_multipoint_a1r.py`
 
