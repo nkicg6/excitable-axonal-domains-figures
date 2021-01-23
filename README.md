@@ -6,6 +6,14 @@ BioRxiv link: TBD
 
 See [excitable-axonal-domains-physiology](https://github.com/nkicg6/excitable-axonal-domains-physiology) for code used to analyze electrophysiology data. 
 
+Analysis code was primarily developed with R on macOS Mojave (version `10.14.6`):
+
+```
+R version 3.6.1 (2019-07-05) -- "Action of the Toes"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+```
+
 # Scripts Key
 
 Please note, these scripts are provided as-is and will not directly run to generate the figures. This is largely due to the fact that they contain hard coded variabes of relative file paths as they did when they were used for the primary analysis. Others were used as part of semi-automated pipelines and bound to key strokes for faster and consistent analysis and data saving (e.g. `th_intensity`). The `.py` files in the Fiji directory are meant to be run with the built in jython interpreter included with Fiji. The Fiji version at the time of submission was: 
