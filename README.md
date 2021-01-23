@@ -1,8 +1,10 @@
-# Utility scripts and figure analysis code for my thesis work.
+# Utility scripts and figure analysis code for my thesis work
 
 Initial submission date: TBD 
 
 BioRxiv link: TBD
+
+See [excitable-axonal-domains-physiology](https://github.com/nkicg6/excitable-axonal-domains-physiology) for code used to analyze electrophysiology data. 
 
 # Scripts Key
 
