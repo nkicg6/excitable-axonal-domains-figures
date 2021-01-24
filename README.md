@@ -9,6 +9,7 @@ See [excitable-axonal-domains-physiology](https://github.com/nkicg6/excitable-ax
 Analysis code was primarily developed with R on macOS Mojave (version `10.14.6`):
 
 ```
+# r --version
 R version 3.6.1 (2019-07-05) -- "Action of the Toes"
 Copyright (C) 2019 The R Foundation for Statistical Computing
 Platform: x86_64-apple-darwin15.6.0 (64-bit)
@@ -16,7 +17,7 @@ Platform: x86_64-apple-darwin15.6.0 (64-bit)
 
 # Scripts Key
 
-Please note, these scripts are provided as-is and will not directly run to generate the figures. This is largely due to the fact that they contain hard coded variabes of relative file paths as they did when they were used for the primary analysis. Others were used as part of semi-automated pipelines and bound to key strokes for faster and consistent analysis and data saving (e.g. `th_intensity`). The `.py` files in the Fiji directory are meant to be run with the built in jython interpreter included with Fiji. The Fiji version at the time of submission was: 
+Please note, these scripts are provided as-is and will not directly run to generate the figures. This is largely due to the fact that they contain hard coded variabes of relative file paths as they did when they were used for the primary analysis. Others were used as part of semi-automated pipelines and bound to key strokes for faster and consistent analysis and data saving (e.g. `th_intensity`). The `.py` files in the Fiji directory are meant to be run with the built in jython interpreter included with [Fiji](https://fiji.sc). The Fiji version at the time of submission was: 
 
 ```
 Version: 2.1.0/1.53c
@@ -25,7 +26,7 @@ Date: 2020-08-02T03:43:22+0000
 ```
 ## `figures/*`
 
-Contains R scripts used to do data wrangling, statistics, and generate plots for figures. 
+R scripts used to do data wrangling, statistics, and generate plots for figures. 
 
 ## `utils/rename_gather_multipoint_a1r.py`
 
