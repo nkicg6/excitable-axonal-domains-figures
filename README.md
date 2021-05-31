@@ -49,4 +49,6 @@ Used to make Figure 3.
 
 Jython script to extract fluoro intensity from pre-traced ROI's and source images. 
 
+## `fiji/format_AMT_EM_Images.py`
 
+Jython script to automatically crop and calibrate EM images from CU Anschutz Core EM scope.
