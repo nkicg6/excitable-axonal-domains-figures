@@ -16,8 +16,8 @@ from java.lang import Double
 start_t = time.time()
 
 
-def getXY(image, channel):
-    image.setC(channel)
+def getXY(image):
+    image.setC(2)
     pp = ProfilePlot(image).getPlot()
     pw = PlotWindow(image, pp)
     x, y = pw.getXValues(), pw.getYValues()
@@ -64,91 +64,29 @@ def fit_curve(x, y):
 def iter_rois_fwhm(roi_path, img_path):
     roi = readRois(roi_path)
     img = Opener.openUsingBioFormats(img_path)
-    fwhm_list = []
-    r2_list = []
-    ch_id_list = []
-    roi_list = []
-    title_list = []
-    full_ch_name = []
-    title = img.getShortTitle()
+    title = str(img.getShortTitle())
+    all_out = []
     for i in roi.getIndexes():
         roi.select(img, i)
-        x, y = getXY(img, channel)
+        x, y = getXY(img)
         fwhm, r2, params = fit_curve(x, y)
-        fwhm_list.append(fwhm)
-        r2_list.append(r2)
-        roi_list.append(i)
-        ch_id_list.append(2)
-        title_list.append(title)
-        full_ch_name.append("Nav1.6")
+        all_out.append(
+            {
+                "fwhm": fwhm,
+                "r2": r2,
+                "roi_id": i,
+                "ch_n": 2,
+                "img_name": title,
+                "ch_name": "NaV1.6",
+            }
+        )
     roi.close()
     img.close()
-    return {
-        "fwhm": fwhm_list,
-        "r2": r2_list,
-        "roi_id": roi_list,
-        "ch_id": ch_id_list,
-        "img_name": title_list,
-        "ch_name": full_ch_name,
-    }
-
-
-def iter_rois_caspr(roi_path, img_path, ch_key):
-    """ NOT WORKING
-	bad json encoding during write, likely a problem using Java Double
-	which is returned by getXY. """
-    channel = 3
-    roi = readRois(roi_path)
-    img = IJ.openImage(img_path)
-    ch_id_list = []
-    roi_list = []
-    title_list = []
-    full_ch_name = []
-    ch_name = ch_key[channel]
-    X = []
-    Y = []
-    title = img.getShortTitle()
-    for i in roi.getIndexes():
-        roi.select(img, i)
-        x, y = getXY(img, channel)
-        X = X + x
-        Y = Y + y
-        roi_list = roi_list + [i] * len(x)
-        ch_id_list = ch_id_list + [channel] * len(x)
-        title_list = title_list + [title] * len(x)
-        full_ch_name = full_ch_name + [ch_name] * len(x)
-    roi.close()
-    img.close()
-    return {
-        "X": X,
-        "Y": Y,
-        "roi_id": roi_list,
-        "ch_id": ch_id_list,
-        "img_name": title_list,
-        "ch_name": full_ch_name,
-    }
-
-
-def merge_similar_dicts(d1, d2):
-    new = {}
-    for k in d1.keys():
-        if k in d2.keys():
-            newl = d1[k] + d2[k]
-            new[k] = newl
-        else:
-            new[k] = d1[k]
-    return new
-
-
-def run_two_channel(roi_path, img_path, channel_key):
-    c1 = iter_rois_fwhm(roi_path, img_path, 1, channel_key)
-    c2 = iter_rois_fwhm(roi_path, img_path, 2, channel_key)
-    new = merge_similar_dicts(c1, c2)
-    return new
+    return all_out
 
 
 def write_json(dict_, out_dir, suffix):
-    base_name = dict_["img_name"][0] + "_" + suffix + ".json"
+    base_name = dict_[0]["img_name"] + "_" + suffix + ".json"
     new_path = os.path.join(out_dir, base_name)
     if not os.path.exists(new_path):
         print("\n\nWriting data to {}\n\n").format(new_path)
@@ -159,9 +97,6 @@ def write_json(dict_, out_dir, suffix):
             new_path
         )
         print(data_)
-
-
-print("starting")
 
 
 def get_real_files(path_, ending):
@@ -194,39 +129,22 @@ def get_roi_file(nd2_path):
 
 #### main run ####
 # CONSTANTS
-CHANNEL_KEY = {1: "Caspr", 2: "Nav1.6"}
-input_dir = ""
+INPUT_DIR = "/Users/nick/Dropbox/lab-data/nodes-alac/example-img/"
 # get files
-f_list = get_real_files(input_dir, ".nd2")
-output_dir = make_dir(input_dir)
-full_len = len(f_list)
+FILE_LIST = get_real_files(INPUT_DIR, ".nd2")
+OUT_DIR = make_dir(INPUT_DIR)
+FULL_LEN = len(FILE_LIST) - 1
 
-for nd2 in f_list:
-    ind = f_list.index(nd2)
+for n, nd2 in enumerate(FILE_LIST):
     print("[INFO] Processing file {}\n".format(nd2))
-    print("[PROGRESS] File {} out of {}\n".format(ind, full_len))
+    print("[PROGRESS] File {} out of {}\n".format(n, FULL_LEN))
     roi_file = get_roi_file(nd2)
-    two_ch = run_two_channel(roi_file, nd2, CHANNEL_KEY)
-    write_json(two_ch, output_dir, "fwhm-ch")
+    out = iter_rois_fwhm(roi_file, nd2)
+    json.dumps(out)
+    write_json(out, OUT_DIR, "fwhm-ch")
 
 
 elapsed = time.time() - start_t
 print("---\n\n\n---")
 print("that took {} seconds".format(elapsed))
 print("Done")
-# that took 1725.39300013 seconds
-
-
-### testing ###
-testimg = "/Users/nick/Dropbox/lab-data/nodes-alac/example-img/12810-1_caspr_nav_occl_img002_s2_right_1.nd2"
-testrois = "/Users/nick/Dropbox/lab-data/nodes-alac/ALAC-nodes-all-rois/12810-1_caspr_nav_occl_img002_s2_right_1-ROIs.zip"
-
-roi = readRois(testrois)
-img = IJ.openImage(testimg)
-# roi.select(img, 1)
-
-# x,y = getXY(img, 3)
-# fwhm,params = fit_curve(x,y)
-### main run
-# c1 = iter_rois_fwhm(testrois, testimg, 1, CHANNEL_KEY)
-# c2 = iter_rois_fwhm(testrois, testimg, 1, CHANNEL_KEY)
