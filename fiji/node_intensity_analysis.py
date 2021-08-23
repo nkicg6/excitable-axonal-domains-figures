@@ -145,8 +145,8 @@ def merge_similar_dicts(d1, d2):
 
 
 def run_two_channel(roi_path, img_path, channel_key):
-    c1 = iter_rois_fwhm(roi_path, img_path, 2, channel_key)
-    c2 = iter_rois_fwhm(roi_path, img_path, 3, channel_key)
+    c1 = iter_rois_fwhm(roi_path, img_path, 1, channel_key)
+    c2 = iter_rois_fwhm(roi_path, img_path, 2, channel_key)
     new = merge_similar_dicts(c1, c2)
     return new
 
@@ -189,7 +189,7 @@ def make_dir(workingDir):
 
 
 def get_roi_file(nd2_path):
-    roi_name = nd2_path.replace(".nd2", "-rois.zip")
+    roi_name = nd2_path.replace(".nd2", "-ROIs.zip")
     assert os.path.exists(roi_name), "ROI file {} for {} not found.".format(
         roi_name, nd2_path
     )
@@ -198,8 +198,8 @@ def get_roi_file(nd2_path):
 
 #### main run ####
 # CONSTANTS
-CHANNEL_KEY = {2: "AnkyrinG", 3: "Nav1.6", 4: "Caspr"}
-input_dir = "/Users/nick/Desktop/node_analysis/blinded/"
+CHANNEL_KEY = {1: "Caspr", 2: "Nav1.6"}
+input_dir = ""
 # get files
 f_list = get_real_files(input_dir, ".nd2")
 output_dir = make_dir(input_dir)
@@ -222,8 +222,8 @@ print("Done")
 
 
 ### testing ###
-testimg = "/Users/nick/Dropbox/lab-data/ALAC nodes all zip files"
-testrois = "/Users/nick/Desktop/node_analysis/blinded/testing_script/testimg-rois.zip"
+testimg = "/Users/nick/Dropbox/lab-data/nodes-alac/example-img/12810-1_caspr_nav_occl_img002_s2_right_1.nd2"
+testrois = "/Users/nick/Dropbox/lab-data/nodes-alac/ALAC-nodes-all-rois/12810-1_caspr_nav_occl_img002_s2_right_1-ROIs.zip"
 
 roi = readRois(testrois)
 img = IJ.openImage(testimg)
