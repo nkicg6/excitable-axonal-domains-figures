@@ -52,7 +52,7 @@ def getFWHM(fit):
 
 def fit_curve(x, y):
     """fits curve of a single gaussian, returns
-	FWHM
+	FWHM, R^2, and the fn args.
 	"""
     cf = CurveFitter(x, y)
     cf.doFit(12)
@@ -61,10 +61,7 @@ def fit_curve(x, y):
     return fwhm, r2, params
 
 
-def iter_rois_fwhm(roi_path, img_path, channel, ch_key):
-    assert (
-        channel == 2 or channel == 3
-    ), "Only functions on channel 1 or 2, channel {} given".format(channel)
+def iter_rois_fwhm(roi_path, img_path):
     roi = readRois(roi_path)
     img = Opener.openUsingBioFormats(img_path)
     fwhm_list = []
@@ -73,7 +70,6 @@ def iter_rois_fwhm(roi_path, img_path, channel, ch_key):
     roi_list = []
     title_list = []
     full_ch_name = []
-    ch_name = ch_key[channel]
     title = img.getShortTitle()
     for i in roi.getIndexes():
         roi.select(img, i)
@@ -82,9 +78,9 @@ def iter_rois_fwhm(roi_path, img_path, channel, ch_key):
         fwhm_list.append(fwhm)
         r2_list.append(r2)
         roi_list.append(i)
-        ch_id_list.append(channel)
+        ch_id_list.append(2)
         title_list.append(title)
-        full_ch_name.append(ch_name)
+        full_ch_name.append("Nav1.6")
     roi.close()
     img.close()
     return {
