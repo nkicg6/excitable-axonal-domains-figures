@@ -45,6 +45,7 @@ control_by_animal_density <- pivot_longer(control_by_animal_cell_count, c("mean_
     stage == "mean_mature_density" ~ "Olig2+ CC1+"
   ))
 
+control_by_animal_density$dummy_name <- forcats::fct_relevel(control_by_animal_density$dummy_name, c("Olig2+ PDGFRα+","Olig2+ CC1+"))
 stage_and_region_means <- group_by(control_by_animal_density, treatment, region, dummy_name) %>%
   summarize(
     mean_region_cell = mean(cell_density),
