@@ -7,7 +7,7 @@ library(Cairo)
 
 #### preamble ####
 
-SAVEALL <- FALSE
+SAVEALL <- TRUE
 
 source("../plotting_defaults/ggplot_theme_defaults.R")
 
@@ -16,9 +16,10 @@ img_save_rt <- "../oligos_and_myelin_occlusion_figure/oligo_occlusion_figures"
 data <- readr::read_csv("~/Dropbox/lab_notebook/projects_and_data/mnc/analysis_and_data/immunohistochemistry/data/summary_data/oligo_lineage/lineage_summary_202008.csv") %>%
   rename("Olig2+ PDGFR\u03b1+" = "prog", "Olig2+ CC1+" = "mature") %>%
   mutate(
+    roi_area_mm2 = roi_area_um2 / 1e6,
     region = case_when(region == "gcl" ~ "GCL", region == "lot" ~ "LOT", TRUE ~ "unknown"),
-    density_prog = `Olig2+ PDGFRα+` / (roi_area_um2 * (41 * 0.3)), # n steps * optical section size * XY area
-    density_mature = `Olig2+ CC1+` / (roi_area_um2 * (41 * 0.3)), # n steps * optical section size * XY area
+    density_prog = `Olig2+ PDGFRα+` / (roi_area_mm2 * (41 * (0.3 / 1000))), # n steps * optical section size * XY area
+    density_mature = `Olig2+ CC1+` / (roi_area_mm2 * (41 * (0.3 / 1000))), # n steps * optical section size * XY area
     total_cells = (`Olig2+ PDGFRα+` + `Olig2+ CC1+`)
   ) %>%
   filter(side != "unknown")
@@ -46,6 +47,8 @@ by_animal_density <- pivot_longer(by_animal_cell_count, c("mean_prog_density", "
     stage == "mean_prog_density" ~ "Olig2+ PDGFR\u03b1+",
     stage == "mean_mature_density" ~ "Olig2+ CC1+"
   ))
+
+by_animal_density$dummy_name <- forcats::fct_relevel(by_animal_density$dummy_name, c("Olig2+ PDGFRα+", "Olig2+ CC1+"))
 
 ttest_annot <- function(df, pair) {
   model <- t.test(cell_density ~ side, data = df, paired = pair)
@@ -94,7 +97,7 @@ make_cell_n_plot <- function(df, treatment_str, region_str, color_palette, paire
     ) +
     coord_cartesian(ylim = c(0, max(labs_df$max_y))) +
     facet_grid(~dummy_name) +
-    labs(x = "", y = "Cells/\u03BCm\u00B3") +
+    labs(x = "", y = "Cells/mm\u00B3") +
     theme_and_axis_nolegend +
     color_palette
 }
@@ -103,7 +106,7 @@ ttest_two_group_annot <- function(df) {
   model <- t.test(mean_cell_density ~ treatment, data = df, paired = F)
   p_value <- paste("p = ", signif(model$p.value, 3), sep = "")
   t_stat <- sprintf("t(%.2f) = %.3f", model$parameter, model$statistic)
-  max_buffered_value <- (max(df$mean_cell_density) * 0.15 + max(df$mean_cell_density))
+  max_buffered_value <- (max(df$mean_cell_density, na.rm = T) * 0.15 + max(df$mean_cell_density, na.rm = T))
   df_ret <- data.frame(
     tstatistic = t_stat, p_text = p_value,
     dataname = model$data.name, max_y = max_buffered_value,
@@ -123,7 +126,7 @@ make_ctrl_occl_plot <- function(df, region_str) {
   filtered_df <- filter(df, region == region_str)
   barplot_df <- filtered_df %>%
     group_by(treatment, stage, dummy_name) %>%
-    summarize(mean_treat_density = mean(mean_cell_density))
+    summarize(mean_treat_density = mean(mean_cell_density, na.rm = T))
   labs_df <- filtered_df %>%
     group_by(dummy_name) %>%
     do(ttest_two_group_annot(.))
@@ -140,7 +143,7 @@ make_ctrl_occl_plot <- function(df, region_str) {
     ) +
     coord_cartesian(ylim = c(0, max(labs_df$max_y))) +
     control_vs_occl_color +
-    labs(x = "", y = "Cells/\u03BCm\u00B3") +
+    labs(x = "", y = "Cells/mm\u00B3") +
     theme_and_axis_nolegend +
     facet_grid(~dummy_name)
 }
