@@ -68,7 +68,20 @@ def return_full_path(target_string: str, path_list: list) -> str:
     for full_path in path_list:
         if target_string in full_path:
             return full_path
-    return f"FULL PATH FOR {target_string} NOT PRESENT"
+    print(f"FULL PATH FOR {target_string} NOT PRESENT")
+    return None
+
+
+def parse_excel(path: str) -> dict:
+    if not path:
+        return None
+    wb = load_workbook(path)
+    sheet1 = wb["Sheet1"]
+    axons_measures = {}
+    for n, things in enumerate(sheet1.values):
+        axons_measures[n] = things
+    wb.close()
+    return axons_measures
 
 
 base_path = "/Users/nick/Dropbox/lab_notebook/projects_and_data/mnc/analysis_and_data/EM/data/em-all-automated/"
@@ -78,3 +91,66 @@ include_paths = filter_files(base_path, "_include.txt")
 include_map = make_include_map(include_paths)
 xlsx_paths = filter_files(base_path, ".xlsx")
 merged_metadata = merge_metadata(blind_key, animal_key, include_map)
+
+
+def make_excel_map(excel_row):
+    return {
+        "gratio": excel_row[3],
+        "axon_area": excel_row[4],
+        "axon_perimeter": excel_row[5],
+        "myelin_area": excel_row[6],
+        "axon_diam": excel_row[7],
+        "myelin_thickness": excel_row[8],
+        "axonmyelin_area": excel_row[9],
+        "axonmyelin_perimeter": excel_row[10],
+        "solidity": excel_row[11],
+    }
+
+
+real_header = (
+    None,
+    "x0",
+    "y0",
+    "gratio",
+    "axon_area",
+    "axon_perimeter",
+    "myelin_area",
+    "axon_diam",
+    "myelin_thickness",
+    "axonmyelin_area",
+    "axonmyelin_perimeter",
+    "solidity",
+    "eccentricity",
+    "orientation",
+)
+
+
+def test_excel_map(real_header):
+    excel_map = make_excel_map(real_header)
+    for item in excel_map.keys():
+        assert item == excel_map[item]
+    print("PASS")
+    return
+
+
+def side_from_name(name: str) -> str:
+    remove_stuff = name.split("_")[0]
+    if remove_stuff.lower().endswith("r"):
+        return "Right"
+    if remove_stuff.lower().endswith("l"):
+        return "Left"
+    raise AssertionError(f"Couldn't identify side for name '{name}'!")
+
+
+#### Example protocol ####
+measurements = []
+current_key = "7f74f87d54564ca684bdcd1eb7a9b477"
+target_xlsx = return_full_path(current_key, xlsx_paths)
+excel_data = parse_excel(target_xlsx)
+for ind in merged_metadata[current_key]["include"]:
+    row = make_excel_map(excel_data[ind])
+    row["treatment"] = merged_metadata[current_key]["treatment"]
+    row["sex"] = merged_metadata[current_key]["sex"]
+    row["animal"] = merged_metadata[current_key]["animal"]
+    row["side"] = side_from_name(row["animal"])
+    measurements.append(row)
