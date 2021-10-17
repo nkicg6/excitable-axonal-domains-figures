@@ -4,16 +4,6 @@ import os
 from openpyxl import load_workbook
 
 
-# newest data: /Users/nick/Dropbox/lab-data/em-round-2/calibrated-blinded/sorted_KEY.csv # DONE!
-# /Users/nick/Dropbox/lab_notebook/projects_and_data/mnc/analysis_and_data/EM/data/em_set1_2019-11/calibrated_for_analysis/KEY.csv # DONE!
-# /Users/nick/Dropbox/lab_notebook/projects_and_data/mnc/analysis_and_data/EM/data/em_set2_2020-02/blinded/KEY.csv # IP
-
-base_path = "done/"
-include_files = [
-    os.path.join(base_path, i) for i in os.listdir(bp) if i.endswith("_include.txt")
-]
-
-
 def _fmt_name(name):
     return os.path.split(name)[-1].replace(".tif", "")
 
