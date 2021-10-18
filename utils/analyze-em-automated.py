@@ -159,8 +159,11 @@ def extract_measurements(
                 return
             row["treatment"] = merged_metadata[target_key]["treatment"]
             row["sex"] = merged_metadata[target_key]["sex"]
-            row["animal"] = merged_metadata[target_key]["animal"]
-            row["side"] = side_from_name(row["animal"])
+            row["animal_id"] = merged_metadata[target_key]["animal"]
+            row["side"] = side_from_name(row["animal_id"])
+            row["animal"] = (
+                row["animal_id"].replace("R", "").replace("L", "").split("_")[0]
+            )
             out.append(row)
         return out
     except Exception as e:
