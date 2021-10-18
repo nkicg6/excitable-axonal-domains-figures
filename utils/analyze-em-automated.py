@@ -186,6 +186,6 @@ if __name__ == "__main__":
             break
         all_data += current_set
 
-        with open(base_path + "all_data.json", "w") as f:
-            json.dump(f, all_data)
-        print(f"writing to {base_path+'all_data.json'}")
+    with open(base_path + "all_data.json", "w") as f:
+        json.dump(all_data, f)
+    print(f"writing to {base_path+'all_data.json'}")
