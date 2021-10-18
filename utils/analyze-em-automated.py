@@ -1,7 +1,7 @@
 import csv
 import json
 import os
-
+from pprint import pprint
 from openpyxl import load_workbook
 
 
@@ -24,22 +24,24 @@ def read_json_key(path: str) -> dict:
     with open(path, "r") as f:
         data = json.load(f)
     for entry in data:
-        out_dict[entry["animal"]] = entry
+        target_animal = entry["animal"]
+        out_dict[target_animal] = entry
+
     return out_dict
 
 
 def merge_metadata(main_key: dict, animal_key: dict, include_dict: dict) -> dict:
-    all_data = {}
-    for key in main_key.keys():
-        target = main_key[key].replace("R", "").replace("L", "").split("_")[0]
-        all_data[key] = animal_key[target]
-        all_data[key]["animal"] = main_key[key]
+    new = {}
+    for k in main_key.keys():
+        base_match = main_key[k].replace("R", "").replace("L", "").split("_")[0]
+        new[k] = animal_key[base_match].copy()
+        new[k]["animal"] = main_key[k]
         try:
-            all_data[key]["include"] = include_dict[key]
+            new[k]["include"] = include_dict[k]
         except KeyError as e:
-            print(f"Key '{key}' does not exist in include_dict. Deleting key.")
-            all_data.pop(key, None)
-    return all_data
+            print(f"Key '{k}' does not exist in include_dict. Deleting key.")
+            new.pop(k, None)
+    return new
 
 
 def parse_include(path):
@@ -69,12 +71,15 @@ def return_full_path(target_string: str, path_list: list) -> str:
         if target_string in full_path:
             return full_path
     print(f"FULL PATH FOR {target_string} NOT PRESENT")
-    return None
+    return ""
 
 
 def parse_excel(path: str) -> dict:
     if not path:
         return None
+    if not os.path.exists(path):
+        print("PATH '{path}' does not exist!")
+        return {}
     wb = load_workbook(path)
     sheet1 = wb["Sheet1"]
     axons_measures = {}
@@ -82,15 +87,6 @@ def parse_excel(path: str) -> dict:
         axons_measures[n] = things
     wb.close()
     return axons_measures
-
-
-base_path = "/Users/nick/Dropbox/lab_notebook/projects_and_data/mnc/analysis_and_data/EM/data/em-all-automated/"
-blind_key = key_to_dict(base_path + "sorted-key-main-merged.csv")
-animal_key = read_json_key(base_path + "animal_info.json")
-include_paths = filter_files(base_path, "_include.txt")
-include_map = make_include_map(include_paths)
-xlsx_paths = filter_files(base_path, ".xlsx")
-merged_metadata = merge_metadata(blind_key, animal_key, include_map)
 
 
 def make_excel_map(excel_row):
@@ -142,15 +138,54 @@ def side_from_name(name: str) -> str:
     raise AssertionError(f"Couldn't identify side for name '{name}'!")
 
 
+def extract_measurements(
+    merged_metadata: dict, xlsx_paths: list, target_key: str
+) -> list:
+    out = []
+    target_xlsx = return_full_path(target_key, xlsx_paths)
+    if not target_xlsx:
+        return
+    try:
+        xlsx_data = parse_excel(target_xlsx)
+        if not xlsx_data:
+            print("No xlsx data.")
+            return
+        for ind in merged_metadata[target_key]["include"]:
+            try:
+                row = make_excel_map(xlsx_data[ind])
+            except KeyError as e:
+                print(f"Key error with key:\n{target_key}")
+                # print(f"Excel data is:\n\n {pprint(xlsx_data)}\n\n")
+                return
+            row["treatment"] = merged_metadata[target_key]["treatment"]
+            row["sex"] = merged_metadata[target_key]["sex"]
+            row["animal"] = merged_metadata[target_key]["animal"]
+            row["side"] = side_from_name(row["animal"])
+            out.append(row)
+        return out
+    except Exception as e:
+        print(f"Problem with key:\n{target_key}")
+        print(f"Exception is:\n {e}")
+        return out
+
+
 #### Example protocol ####
-measurements = []
-current_key = "7f74f87d54564ca684bdcd1eb7a9b477"
-target_xlsx = return_full_path(current_key, xlsx_paths)
-excel_data = parse_excel(target_xlsx)
-for ind in merged_metadata[current_key]["include"]:
-    row = make_excel_map(excel_data[ind])
-    row["treatment"] = merged_metadata[current_key]["treatment"]
-    row["sex"] = merged_metadata[current_key]["sex"]
-    row["animal"] = merged_metadata[current_key]["animal"]
-    row["side"] = side_from_name(row["animal"])
-    measurements.append(row)
+
+if __name__ == "__main__":
+    base_path = "/Users/nick/Dropbox/lab_notebook/projects_and_data/mnc/analysis_and_data/EM/data/em-all-automated/"
+    blind_key = key_to_dict(base_path + "sorted-key-main-merged.csv")
+    animal_key = read_json_key(base_path + "animal_info.json")
+    include_paths = filter_files(base_path, "_include.txt")
+    include_map = make_include_map(include_paths)
+    xlsx_paths = filter_files(base_path, ".xlsx")
+    merged_metadata = merge_metadata(blind_key, animal_key, include_map)
+    all_data = []
+    for item in merged_metadata.keys():
+        current_set = extract_measurements(merged_metadata, xlsx_paths, item)
+        if not current_set:
+            break
+        all_data += current_set
+
+        with open(base_path + "all_data.json", "w") as f:
+            json.dump(f, all_data)
+        print(f"writing to {base_path+'all_data.json'}")
