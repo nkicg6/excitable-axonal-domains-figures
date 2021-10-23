@@ -117,8 +117,8 @@ gratio_side_plot <- function(df, treatment_str, colors) {
     facet_grid(~treatment) +
     theme(legend.position = c(0.15, 0.9)) +
     scale_y_continuous(breaks = seq(0, 1, 0.1)) +
-    scale_x_continuous(breaks = seq(0, 4, 0.5)) +
-    coord_cartesian(xlim = c(0, 4), ylim = c(0.3, 1)) +
+    scale_x_continuous(breaks = seq(0, 3, 0.5)) +
+    coord_cartesian(xlim = c(0, 3), ylim = c(0.3, 1)) +
     colors
 
   insert_plot <- ggplot(data = mean_df, aes(x = side, y = mean_group, color = side)) +
@@ -181,16 +181,16 @@ gratio_treatment_plot <- function(df) {
     control_vs_occl_color +
     labs(x = "", y = "Mean g-ratio") +
     annotate("text",
-             label = paste("p = ", signif(ttest_res$p.value, 2)),
-             x = 1.5, y = y_ttest, size = custom_annotation_size
+      label = paste("p = ", signif(ttest_res$p.value, 2)),
+      x = 1.5, y = y_ttest, size = custom_annotation_size
     ) +
     scale_y_continuous(breaks = seq(0, 1, 0.5)) +
     coord_cartesian(ylim = c(0, 1.3)) +
     insert_theme
   ggdraw(main_plot) +
     draw_plot(insert_plot,
-              x = 0.6, y = 0.15,
-              width = 0.3, height = 0.5, scale = 1
+      x = 0.6, y = 0.15,
+      width = 0.3, height = 0.5, scale = 1
     )
 }
 
