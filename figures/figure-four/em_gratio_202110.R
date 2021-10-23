@@ -220,13 +220,12 @@ if (SAVEALL) {
 }
 
 t.test(gratio ~ treatment, data = gr)
-ggplot(gr, aes(x = gratio, fill = treatment)) +
+ggplot(gr, aes(x = axon_diam, fill = treatment)) +
   geom_histogram(aes(y = ..density..),
-                 binwidth = 0.2,
-                 position = "dodge",
-                 alpha = 0.8
+    binwidth = 0.2,
+    position = "dodge",
+    alpha = 0.8
   ) +
   theme_and_axis_legend +
   control_vs_occl_fill +
   labs(x = "Axon diameter (\u03BCm)", y = "Density")
-
