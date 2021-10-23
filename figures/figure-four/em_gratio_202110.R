@@ -6,7 +6,7 @@ library(Cairo)
 SAVEALL <- TRUE
 
 source("../plotting_defaults/ggplot_theme_defaults.R")
-img_save_rt <- "../oligos_and_myelin_characterization_figure/em_figures"
+img_save_rt <- "../oligos_and_myelin_occlusion_figure/em_occlusion_figures"
 
 #### grouping and processing ####
 all_data_path <- "/Users/nick/Dropbox/lab_notebook/projects_and_data/mnc/analysis_and_data/EM/data/em-all-automated/all_data.json"
@@ -92,7 +92,7 @@ car::Anova(lm_gr_treatment_and_side_interaction, type = "II")
 
 anova_lm_gr_treatment_side_ineraction <- anova(lm_gr_treatment_and_side_interaction)
 
-#### Plot functions ####
+#### Plot within treatment ####
 
 gratio_side_plot <- function(df, treatment_str, colors) {
   df_filtered <- filter(df, treatment == treatment_str)
@@ -140,10 +140,27 @@ gratio_side_plot <- function(df, treatment_str, colors) {
     insert_theme
   ggdraw(main_plot) +
     draw_plot(insert_plot,
-      x = 0.6, y = 0.15,
+      x = 0.7, y = 0.15,
       width = 0.3, height = 0.5, scale = 1
     )
 }
+gratio_side_plot(gr, "Control", ctrl_color)
+
+if (SAVEALL) {
+  ggsave(file.path(img_save_rt, "gratio_control_lm_revision.pdf"),
+    width = 8, height = 5, dpi = 300, device = cairo_pdf
+  )
+}
+
+gratio_side_plot(gr, "Naris Occlusion", occl_color)
+
+if (SAVEALL) {
+  ggsave(file.path(img_save_rt, "gratio_naris_occl_lm_revision.pdf"),
+    width = 8, height = 5, dpi = 300, device = cairo_pdf
+  )
+}
+
+#### Plotting function between treatment ####
 
 gratio_treatment_plot <- function(df) {
   max_filt <- max(df$gratio)
@@ -166,8 +183,8 @@ gratio_treatment_plot <- function(df) {
     labs(x = "Axon diameter (\u03BCm)", y = "G-ratio") +
     theme(legend.position = c(0.2, 0.9)) +
     scale_y_continuous(breaks = seq(0, 1, 0.1)) +
-    scale_x_continuous(breaks = seq(0, 4, 0.5)) +
-    coord_cartesian(xlim = c(0, 4), ylim = c(0.3, 1)) +
+    scale_x_continuous(breaks = seq(0, 3, 0.5)) +
+    coord_cartesian(xlim = c(0, 3), ylim = c(0.3, 1)) +
     control_vs_occl_color
 
   insert_plot <- ggplot(data = mean_df, aes(x = treatment, y = mean_group, color = treatment)) +
@@ -193,5 +210,3 @@ gratio_treatment_plot <- function(df) {
       width = 0.3, height = 0.5, scale = 1
     )
 }
-
-gratio_side_plot(gr, "Control", ctrl_color)
