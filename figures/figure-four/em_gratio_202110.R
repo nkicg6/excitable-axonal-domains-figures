@@ -135,8 +135,8 @@ gratio_side_plot <- function(df, treatment_str, colors) {
       label = paste("p = ", signif(ttest_res$p.value, 2)),
       x = 1.5, y = y_ttest, size = custom_annotation_size
     ) +
-    scale_y_continuous(breaks = seq(0, 1, 0.5)) +
-    coord_cartesian(ylim = c(0, 1.3)) +
+    scale_y_continuous(breaks = seq(0.5, 1, 0.2)) +
+    coord_cartesian(ylim = c(0.5, 1)) +
     insert_theme
   ggdraw(main_plot) +
     draw_plot(insert_plot,
@@ -199,14 +199,34 @@ gratio_treatment_plot <- function(df) {
     labs(x = "", y = "Mean g-ratio") +
     annotate("text",
       label = paste("p = ", signif(ttest_res$p.value, 2)),
-      x = 1.5, y = y_ttest, size = custom_annotation_size
+      x = 1.55, y = y_ttest, size = custom_annotation_size
     ) +
-    scale_y_continuous(breaks = seq(0, 1, 0.5)) +
-    coord_cartesian(ylim = c(0, 1.3)) +
+    scale_y_continuous(breaks = seq(0.5, 1, 0.2)) +
+    coord_cartesian(ylim = c(0.5, 1)) +
     insert_theme
   ggdraw(main_plot) +
     draw_plot(insert_plot,
       x = 0.6, y = 0.15,
-      width = 0.3, height = 0.5, scale = 1
+      width = 0.36, height = 0.5, scale = 1
     )
 }
+
+gratio_treatment_plot(gr)
+
+if (SAVEALL) {
+  ggsave(file.path(img_save_rt, "gratio_naris_occl_vs_control_lm_revision.pdf"),
+    width = 8, height = 5, dpi = 300, device = cairo_pdf
+  )
+}
+
+t.test(gratio ~ treatment, data = gr)
+ggplot(gr, aes(x = gratio, fill = treatment)) +
+  geom_histogram(aes(y = ..density..),
+                 binwidth = 0.2,
+                 position = "dodge",
+                 alpha = 0.8
+  ) +
+  theme_and_axis_legend +
+  control_vs_occl_fill +
+  labs(x = "Axon diameter (\u03BCm)", y = "Density")
+
