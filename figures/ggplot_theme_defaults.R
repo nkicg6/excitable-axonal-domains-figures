@@ -1,6 +1,6 @@
 # Plotting defaults for R figures
 # Author: Nicholas George
-# last updated: 2021-01-22
+# last updated: 2021-10-03
 library(ggplot2)
 
 # call sink("file/to/write/to.txt") before this, then do all results, and close with sink()
@@ -46,8 +46,8 @@ control_vs_occl_fill <- scale_fill_manual(values = c(black, occl_single_color))
 color_color <- scale_color_manual(values = c(black,grey,open_single_color, occl_single_color))
 fill_fill <- scale_fill_manual(values = c(black,grey,open_single_color, occl_single_color))
 
-oligo_lineage_fill <-  scale_fill_manual(values = c("#00BFFF", "magenta"))
-oligo_lineage_color <-  scale_color_manual(values = c("#00BFFF", "magenta"))
+oligo_lineage_fill <-  scale_fill_manual(values = c("magenta", "#00BFFF"))
+oligo_lineage_color <-  scale_color_manual(values = c("magenta", "#00BFFF"))
 
 pt_alpha <- 0.6
 pt_stroke <- 1

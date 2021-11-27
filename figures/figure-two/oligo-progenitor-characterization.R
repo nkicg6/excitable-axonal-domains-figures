@@ -6,7 +6,7 @@ library(Cairo)
 
 #### preamble ####
 
-SAVEALL <- FALSE
+SAVEALL <- TRUE
 
 source("../plotting_defaults/ggplot_theme_defaults.R")
 
@@ -15,9 +15,10 @@ img_save_rt <- "../oligos_and_myelin_characterization_figure/oligos_figures/"
 control_data <- readr::read_csv("~/Dropbox/lab_notebook/projects_and_data/mnc/analysis_and_data/immunohistochemistry/data/summary_data/oligo_lineage/lineage_summary_202008.csv") %>%
   rename("Olig2+ PDGFR\u03b1+" = "prog", "Olig2+ CC1+" = "mature") %>%
   mutate(
+    roi_area_mm2 = roi_area_um2 / 1e6,
     region = case_when(region == "gcl" ~ "GCL", region == "lot" ~ "LOT", TRUE ~ "unknown"),
-    density_prog = `Olig2+ PDGFRα+` / (roi_area_um2 * (41 * 0.3)), # n steps * optical section size * XY area
-    density_mature = `Olig2+ CC1+` / (roi_area_um2 * (41 * 0.3)), # n steps * optical section size * XY area
+    density_prog = `Olig2+ PDGFRα+` / (roi_area_mm2 * (41 * (0.3/1000))), # n steps * optical section size * XY area
+    density_mature = `Olig2+ CC1+` / (roi_area_mm2 * (41 * (0.3/1000))), # n steps * optical section size * XY area
     total_cells = (`Olig2+ PDGFRα+` + `Olig2+ CC1+`)
   ) %>%
   filter(side != "unknown", treatment == "Control")
@@ -44,6 +45,7 @@ control_by_animal_density <- pivot_longer(control_by_animal_cell_count, c("mean_
     stage == "mean_mature_density" ~ "Olig2+ CC1+"
   ))
 
+control_by_animal_density$dummy_name <- forcats::fct_relevel(control_by_animal_density$dummy_name, c("Olig2+ PDGFRα+","Olig2+ CC1+"))
 stage_and_region_means <- group_by(control_by_animal_density, treatment, region, dummy_name) %>%
   summarize(
     mean_region_cell = mean(cell_density),
@@ -56,7 +58,7 @@ stage_and_region_means <- group_by(control_by_animal_density, treatment, region,
 #### Plots ####
 
 ggplot(control_by_animal_density, aes(x = region, y = cell_density, color = dummy_name)) +
-  labs(x = "", y = "Cells/\u03BCm\u00B3") +
+  labs(x = "", y = "Cells/mm\u00B3") +
   theme_and_axis_legend +
   geom_bar(
     data = stage_and_region_means,
@@ -78,7 +80,7 @@ ggplot(control_by_animal_density, aes(x = region, y = cell_density, color = dumm
 
 
 ggplot(control_by_animal_density, aes(x = region, y = cell_density, fill = dummy_name)) +
-  labs(x = "", y = "Cells/\u03BCm\u00B3") +
+  labs(x = "", y = "Cells/mm\u00B3") +
   theme_and_axis_legend +
   geom_bar(
     data = stage_and_region_means,

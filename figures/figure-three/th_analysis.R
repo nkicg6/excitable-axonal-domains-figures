@@ -73,7 +73,7 @@ ggplot(relative_summarized, aes(x = treatment, y = relative, color = treatment))
     linetype = "longdash", size = line_size
   ) +
   annotate("text", x = 1.5, y = 1.3, label = paste("p = ", signif(ttest_relative$p.value, 3)), size = custom_annotation_size) +
-  labs(x = "", y = "TH intensity occluded / open")
+  labs(x = "", y = "TH fluorescence intensity \noccluded / open")
 
 if (SAVEALL) {
   ggsave(file.path(img_save_rt, "th_relative_figure.pdf"),
@@ -98,7 +98,7 @@ ggplot(summary_data, aes(x = side, y = mean_intensity / 100, color = side)) +
   ) +
   color_color +
   theme_and_axis_nolegend +
-  labs(x = "", y = "Fluoro. intensity (a.u.)") +
+  labs(x = "", y = "TH fluorescence intensity (a.u.)") +
   annotate("text", x = 1.5, y = 260, label = paste("p = ", signif(ttest_paired_control$p.value, 3)), size = custom_annotation_size) +
   annotate("text", x = 3.5, y = 260, label = paste("p = ", signif(ttest_paired_occl$p.value, 3)), size = custom_annotation_size)
 
